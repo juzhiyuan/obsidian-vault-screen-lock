@@ -2,6 +2,7 @@ import { Component, Plugin } from "obsidian";
 import { createVerifier, isPasswordVerifier, PasswordVerifier, verifyPassword } from "./password";
 
 const storageKey = "vault-screen-lock:verifier";
+const iframeFocusCheckIntervalMs = 25;
 
 export default class VaultScreenLock extends Plugin {
   private readonly screens = new Map<Window, LockScreen>();
@@ -92,6 +93,7 @@ class LockScreen extends Component {
   private readonly status: HTMLParagraphElement;
   private shouldShow = false;
   private formGeneration = 0;
+  private iframeFocusCheck: number | undefined;
 
   constructor(
     private readonly win: Window,
@@ -117,7 +119,7 @@ class LockScreen extends Component {
       if (doc.hidden) this.onBackground();
     });
     this.registerDomEvent(this.win, "pagehide", this.onBackground);
-    this.registerDomEvent(this.win, "blur", this.onBackground);
+    this.registerDomEvent(this.win, "blur", () => this.handleBlur());
 
     // Stop global application shortcuts while allowing native input and form submission.
     const blockShortcuts = (event: KeyboardEvent) => {
@@ -137,11 +139,13 @@ class LockScreen extends Component {
   }
 
   onunload(): void {
+    this.stopIframeFocusCheck();
     this.hide();
     this.dialog.remove();
   }
 
   show(verifier: PasswordVerifier | null | undefined): void {
+    this.stopIframeFocusCheck();
     this.shouldShow = true;
     const setup = verifier === null;
     const unavailable = verifier === undefined;
@@ -157,6 +161,28 @@ class LockScreen extends Component {
     this.button.textContent = setup ? "Set password" : "Unlock";
     this.status.textContent = unavailable ? "The saved password settings could not be read." : "";
     this.open();
+  }
+
+  private handleBlur(): void {
+    const doc = this.win.document;
+    if (!doc.hasFocus()) {
+      this.onBackground();
+      return;
+    }
+    if (this.shouldShow || this.iframeFocusCheck !== undefined) return;
+
+    // Focus may be moving into an iframe, which can receive subsequent blur events itself.
+    this.iframeFocusCheck = this.win.setInterval(() => {
+      const focused = doc.hasFocus();
+      if (!focused || doc.activeElement?.tagName !== "IFRAME") this.stopIframeFocusCheck();
+      if (!focused) this.onBackground();
+    }, iframeFocusCheckIntervalMs);
+  }
+
+  private stopIframeFocusCheck(): void {
+    if (this.iframeFocusCheck === undefined) return;
+    this.win.clearInterval(this.iframeFocusCheck);
+    this.iframeFocusCheck = undefined;
   }
 
   hide(): void {
