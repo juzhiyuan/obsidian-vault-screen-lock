@@ -20,7 +20,7 @@ Switching apps and minimizing have been tested on Linux with X11, along with a s
 
 ## Privacy and limits
 
-The plugin runs offline. It stores a salted password verifier in Obsidian's vault-specific device storage. Set a password on each device. Obsidian stores the mobile grace period with the plugin data in the vault's configuration folder.
+The plugin runs offline. It stores a salted password verifier in Obsidian's vault-specific device storage. Set a password on each device. Obsidian stores the mobile grace period with the plugin data in the vault's configuration folder. Sync can carry the grace period across devices if it includes plugin settings.
 
 This is a privacy screen for casual access. Notes and attachments remain readable on disk. Anyone who can open Obsidian's Settings can disable the plugin, including from a separate Settings window that was left open. Close Settings before stepping away. Restricted Mode also lets you open the vault with community plugins disabled. On mobile the plugin covers the workspace during the grace period when the web view delivers its background event. The operating system controls when it captures app previews.
 

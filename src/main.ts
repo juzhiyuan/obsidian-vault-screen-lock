@@ -25,8 +25,9 @@ export default class VaultScreenLock extends Plugin {
   private lockGeneration = 0;
   private disposed = false;
   private pendingDesktopWarning: string | undefined;
-  private mobileBackgroundedAt: number | undefined;
-  private mobileGraceSeconds = defaultMobileGraceSeconds;
+  private mobileBackgroundedAt: { wallTime: number; monotonicTime: number } | undefined;
+  // Until the stored preference is known, lock immediately on background.
+  private mobileGraceSeconds = 0;
 
   onload(): void {
     try {
@@ -146,7 +147,7 @@ export default class VaultScreenLock extends Plugin {
     const doc = win.document;
     const background = () => {
       if (this.mobileBackgroundedAt !== undefined) return;
-      this.mobileBackgroundedAt = Date.now();
+      this.mobileBackgroundedAt = { wallTime: Date.now(), monotonicTime: win.performance.now() };
       if (this.locked || this.mobileGraceSeconds === 0) {
         this.lock();
         return;
@@ -155,10 +156,11 @@ export default class VaultScreenLock extends Plugin {
     };
     const foreground = () => {
       if (doc.hidden || this.mobileBackgroundedAt === undefined) return;
-      const elapsed = Date.now() - this.mobileBackgroundedAt;
+      const wallElapsed = Date.now() - this.mobileBackgroundedAt.wallTime;
+      const monotonicElapsed = win.performance.now() - this.mobileBackgroundedAt.monotonicTime;
       this.mobileBackgroundedAt = undefined;
       if (this.locked) return;
-      if (elapsed < 0 || elapsed >= this.mobileGraceSeconds * 1000) this.lock();
+      if (wallElapsed < 0 || Math.max(wallElapsed, monotonicElapsed) >= this.mobileGraceSeconds * 1000) this.lock();
       else for (const screen of this.screens.values()) screen.hide();
     };
     this.registerDomEvent(doc, "visibilitychange", () => {
@@ -173,16 +175,18 @@ export default class VaultScreenLock extends Plugin {
   }
 
   private async loadMobileSettings(): Promise<void> {
+    let seconds = defaultMobileGraceSeconds;
     try {
       const data: unknown = await this.loadData();
       if (typeof data === "object" && data !== null &&
           "mobileGraceSeconds" in data && isGraceSeconds(data.mobileGraceSeconds)) {
-        this.mobileGraceSeconds = data.mobileGraceSeconds;
+        seconds = data.mobileGraceSeconds;
       }
     } catch {
       // Use the default if the plugin settings are unavailable.
     }
     if (this.disposed) return;
+    this.mobileGraceSeconds = seconds;
 
     this.addSettingTab(new MobileLockSettings(this, () => this.mobileGraceSeconds, async (seconds) => {
       if (this.disposed || this.mobileGraceSeconds === seconds) return;
