@@ -1,0 +1,10 @@
+{
+  "id": "vault-screen-lock",
+  "name": "Vault Screen Lock",
+  "version": "0.1.0",
+  "minAppVersion": "1.15.0",
+  "description": "Lock the vault workspace with a password when the app loses focus.",
+  "author": "juzhiyuan",
+  "isDesktopOnly": true,
+  "authorUrl": "https://github.com/juzhiyuan"
+}

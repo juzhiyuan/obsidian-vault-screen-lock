@@ -1,0 +1,33 @@
+{
+  "name": "vault-screen-lock",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc --noEmit && node build.mjs",
+    "lint": "eslint src manifest.json --max-warnings 0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "eslint": "9.39.5",
+    "eslint-plugin-obsidianmd": "0.5.1",
+    "obsidian": "1.14.4",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.72.2"
+  },
+  "description": "An offline workspace privacy lock for Obsidian.",
+  "main": "main.js",
+  "license": "MIT",
+  "author": "juzhiyuan",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/juzhiyuan/obsidian-vault-screen-lock.git"
+  },
+  "overrides": {
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": "11.0.5"
+    },
+    "eslint-plugin-n": {
+      "minimatch": "11.0.5"
+    }
+  }
+}
