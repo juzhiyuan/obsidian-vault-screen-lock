@@ -3,7 +3,7 @@
   "name": "Vault Screen Lock",
   "version": "0.1.2",
   "minAppVersion": "1.15.0",
-  "description": "Lock the vault workspace with a password when the app goes into the background.",
+  "description": "Lock the vault workspace with a local password on desktop screen lock, after a mobile background delay, or on demand.",
   "author": "juzhiyuan",
   "isDesktopOnly": false,
   "authorUrl": "https://github.com/juzhiyuan"
