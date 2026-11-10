@@ -1,4 +1,4 @@
-import { Component, Plugin } from "obsidian";
+import { Component, Platform, Plugin } from "obsidian";
 import { createVerifier, isPasswordVerifier, PasswordVerifier, verifyPassword } from "./password";
 
 const storageKey = "vault-screen-lock:verifier";
@@ -119,7 +119,9 @@ class LockScreen extends Component {
       if (doc.hidden) this.onBackground();
     });
     this.registerDomEvent(this.win, "pagehide", this.onBackground);
-    this.registerDomEvent(this.win, "blur", () => this.handleBlur());
+    this.registerDomEvent(this.win, "blur", () => {
+      if (Platform.isDesktop) this.handleBlur();
+    });
 
     // Stop global application shortcuts while allowing native input and form submission.
     const blockShortcuts = (event: KeyboardEvent) => {

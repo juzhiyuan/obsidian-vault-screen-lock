@@ -1,8 +1,8 @@
 # Vault Screen Lock
 
-Lock an Obsidian vault's workspace with a local password when Obsidian loses focus. The lock covers the main window and pop-out windows. Switching between those windows also locks the workspace. Returning to Obsidian or reopening the vault requires the password.
+Lock an Obsidian vault's workspace with a local password when Obsidian goes into the background. On desktop the lock covers the main window and pop-out windows. Switching between desktop windows also locks the workspace. On mobile the lock responds when Obsidian's web view becomes hidden. Returning to a locked workspace or reopening the vault requires the password.
 
-Vault Screen Lock requires Obsidian 1.15.0 or later on desktop. The lock has been tested on Linux with Obsidian 1.15.0. Windows and macOS still need desktop verification.
+Vault Screen Lock requires Obsidian 1.15.0 or later. The lock has been tested on Linux. iOS, Android, Windows, and macOS still need native verification.
 
 ## Install and use
 
@@ -22,7 +22,7 @@ This is a privacy screen for casual access. Notes and attachments remain readabl
 If you forget the password or the lock screen says the saved settings could not be read, reset the verifier for that vault on this device.
 
 1. Disable Vault Screen Lock in **Settings → Community plugins**, or open the vault in Restricted Mode. If you cannot reach either option, quit Obsidian and temporarily move the `plugins/vault-screen-lock` folder out of the vault's configuration folder. Reopen the same vault.
-2. In the vault workspace, open **View → Toggle Developer Tools** and select **Console**. The shortcut is `Ctrl+Shift+I` on Windows and Linux, or `Cmd+Option+I` on macOS. Run this command to clear just the plugin's password verifier for the open vault.
+2. In the vault workspace, open **View → Toggle Developer Tools** and select **Console**. On mobile, use the [Obsidian guide to inspecting the web view](https://docs.obsidian.md/Plugins/Getting%20started/Mobile%20development) on the device where you set the password. Run this command to clear just the plugin's password verifier for the open vault.
 
    ```js
    app.saveLocalStorage("vault-screen-lock:verifier", null)
@@ -42,7 +42,7 @@ npm run build
 
 Attach `main.js`, `manifest.json`, and `styles.css` individually to a GitHub Release whose tag equals the manifest version.
 
-The build pins the public `obsidian` type package independently of the minimum desktop app version, which reflects the runtime used to verify the plugin.
+The build pins the public `obsidian` type package independently of the minimum app version, which reflects the runtime used to verify the plugin.
 
 ## License
 
